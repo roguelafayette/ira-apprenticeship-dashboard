@@ -7,7 +7,7 @@ weekly ratios, identify violations, and drill down to craft and
 employee-level detail.
 
 ## 🎯 Live Dashboard
-[(https://public.tableau.com/views/ApprenticeshipComplianceDashboard/IRADashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)]
+https://public.tableau.com/views/ApprenticeshipComplianceDashboard/IRADashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 
 ## 📊 Key Features
 - Federal apprentice/journeyman ratio tracking
