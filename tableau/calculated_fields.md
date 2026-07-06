@@ -9,35 +9,49 @@ handling, and violation flagging in the dashboard.
 ## Headcount
 
 ### Distinct count of Employee ID
-**Purpose:** Give the employee count (for a given day in the visualization)
+**Purpose:** Give the employee count (for a given day in the visualization).
 
 **Formula:**
 ```
 COUNTD([Employee ID])
 ```
 
-**Notes:** Distinct count is done because employees may show up multiple times per day or per week either because they worked multiple days (weekly count) or multiple classifications / crafts in a day (daily count)
+**Notes:** Distinct count is done because employees may show up multiple times per day or per week either because they worked multiple days (weekly count) or multiple classifications / crafts in a day (daily count).
 
 ---
 
-## Apprentice Headcount
+## Apprentice Count
 
 ### Distinct count of Apprentice Employee IDs
-**Purpose:** Give the apprentice count (for a given day in the visualization)
+**Purpose:** Give the apprentice count (for a given day in the visualization).
 
 **Formula:**
 ```
 COUNTD(if [Classification Calc] = "Apprentice" then [Employee ID] END)
 ```
 
-**Notes:** Distinct count is done because employees may show up multiple times per day or per week either because they worked multiple days (weekly count) or multiple classifications / crafts in a day (daily count)
+**Notes:** Distinct count is done because employees may show up multiple times per day or per week either because they worked multiple days (weekly count) or multiple classifications / crafts in a day (daily count).
+
+---
+
+## JW Count
+
+### Distinct count of Journeyman (Journeyworker) Employee IDs
+**Purpose:** Give the journeyman count (for a given day in the visualization).
+
+**Formula:**
+```
+COUNTD(if [Classification Calc] = "Journeyman" then [Employee ID] END)
+```
+
+**Notes:** Distinct count is done because employees may show up multiple times per day or per week either because they worked multiple days (weekly count) or multiple classifications / crafts in a day (daily count).
 
 ---
 
 ## Ratio Classifications ("Classification Calc")
 
 ### Apprentice, Journeyman, or 0 (None)
-**Purpose:** Classify employee timecard distinction of hours - three options are the output of this formula
+**Purpose:** Classify employee timecard distinction of hours - three options are the output of this formula.
 
 **Formula:**
 ​```
@@ -84,19 +98,6 @@ Any time the "Disqualified" moniker is given in the classification it is always 
 
 ---
 
-### Apprentice Ratio
-**Purpose:** Calculates the actual apprentice ratio (apprentice hours / total hours) for compliance tracking against federal IRA thresholds.
-
-**Formula:**
-​```
-SUM([Apprentice Hours]) / 
-(SUM([Apprentice Hours]) + SUM([Journeyman Hours]))
-​```
-
-**Notes:** Displayed as a percentage. Compared against the federal IRA minimum threshold to identify compliance status.
-
----
-
 ## Week-Ending Date Logic
 
 ### Week Ending Date
@@ -114,7 +115,7 @@ DATEADD('day', -1, DATEADD('week', 1, DATETRUNC('week', [Date])))
 ## Compliance Status Flag
 
 ### Ratio Compliance Status
-**Purpose:** Count the number of apprentices vs journeyman for IRA compliance (translated from boolean T/F to "Yes / No" in "Ratio - 'Craft Name'" calculation
+**Purpose:** Count the number of apprentices vs journeyman for IRA compliance.
 
 **Formula:**
 ​```
@@ -123,14 +124,73 @@ IFNULL(COUNTD(if [Classification Calc]= "Apprentice" AND [Craft Name] = "Carpent
 IFNULL(COUNTD(if [Classification Calc] = "Journeyman" AND [Craft Name] = "Carpenter" then [Employee ID]END),0)
 ​```
 
-**Notes:** Craft Names are subsituted to provide a specific calc for each craft.
+**Notes:** Craft Names are subsituted to provide a specific calc for each craft. Translated from boolean T/F to "Yes / No" in "IRA Compliant (Craft Name) function".
+
+---
+
+## Overage Calculator
+
+### Overage of Apprentices (vs Journeyman) if present
+**Purpose:** Determine the overage of apprentices so that compliance teams can see the number of apprentices that need to be disqualified for a given day and project.
+
+**Formula:**
+```
+[Apprentice Count]-[JW Count]
+```
+
+**Notes:** Used on the "Ratio Errors Dashboard" for the overage amounts in the table as well as the details in the tooltip.
+
+---
+## Ratio Summary
+
+### Total Ratio Calculation
+**Purpose:** Determine the overall ratio compliance for an entire project, or all projects if all are selected through the dropdown filters.
+
+**Formula:**
+```
+if [IRA Compliant (Labor)] = 
+FALSE 
+OR
+[IRA Compliant (Oper)] = 
+FALSE
+OR
+[IRA Compliant (Electr)] = 
+FALSE
+OR
+[IRA Compliant (Mech)] =
+FALSE
+OR
+[IRA Compliant (Carp)] =
+FALSE
+then
+"NO"
+ELSEIF [IRA Compliant (Labor)] = 
+TRUE
+OR
+[IRA Compliant (Oper)] = 
+TRUE
+OR
+[IRA Compliant (Electr)] = 
+TRUE
+OR
+[IRA Compliant (Carp)] = 
+TRUE
+OR
+[IRA Compliant (Mech)] = 
+TRUE
+Then
+"YES"
+END
+```
+
+**Notes:** Present in the "Summary" section of the IRA Dashboard under the "Ratio Satisfied?" row. Designed to list a "No" if any of the 5 crafts are out of ratio for a given date.
 
 ---
 
 ## Compliance Boolean Translation
 
 ### Ratio compliance "Yes" / "No"
-**Purpose:** Translate T/F values derived from Ratio Complaince calcs into a more user-friendly "Yes" / "No" format to track daily compliance
+**Purpose:** Translate T/F values derived from Ratio Complaince calcs into a more user-friendly "Yes" / "No" format to track daily compliance.
 
 ```
 if ISNULL([IRA Compliant (Carpenter)])
